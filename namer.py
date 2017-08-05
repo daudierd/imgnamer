@@ -33,7 +33,7 @@ def suggested_name(filepath, method='BEST_GUESS', sites=None):
         return prettify(best_guess(filepath))
     elif method == 'RESULTS':
         res = fetch_results(filepath)
-        return prettify(res[0].title)
+        return prettify(choose_best(res))
     else:
         return ''
 
@@ -58,53 +58,9 @@ def best_guess(filepath):
     else:
         return ''
 
-##################################################
-# ---------------------------------------------- #
-# ---- CHOICE ALGORITHM NEEDS TO BE REVIEWED --- #
-# ---------------------------------------------- #
-##################################################
-
-def choose_best(suggestion_list):
-    # In the event that the suggestion list is empty, return empty string
-    if not suggestion_list:
-        return ''
-
-    # Create a dictionary of number of occurences for each encountered word
-    words = dict()
-    for i, sug in enumerate(suggestion_list):
-        new_sug = sug.split(' | ')[0]
-        if new_sug == sug:
-            new_sug = new_sug.split(' - ')[0]
-        suggestion_list[i] = new_sug
-        for w in new_sug.split(' '):
-            if len(w) > 2:
-                if w in words:
-                    words[w] = words[w] + 1
-                else:
-                    words[w] = 1
-
-    # If keyword 'by' is identified, this may match pattern 'title by artist'
-    for s in suggestion_list:
-        new_s = s.split(' by ')[0]
-        if new_s != s:
-            return s
-
-    # Return the two words with the most occurences
-    words = sorted(words)
-    return (words[-1] + ' ' + words[-2])
-
-    # A suggestion score is the geometric mean of the score of each word (number
-    # of occurences). Short words (< 2 letters) impact the score negatively.
-    suggestion_scores = dict()
-    highest_score = 0
-    for s in suggestion_list:
-        score = 0
-        for w in s.split(' '):
-                score = score + words[w]
-        score = score / len(words)
-        # Update highest score & add it as a key in suggestion_scores
-        highest_score = max(score, highest_score)
-        suggestion_scores[score] = s
-
-    # Return the suggestion with the highest score is
-    return suggestion_scores[highest_score]
+def choose_best(results):
+    """
+    Determine the best name from a list of results.
+    """
+    # TO DO: for now, return the first result
+    return results[0].title
