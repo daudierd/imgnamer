@@ -1,3 +1,18 @@
+#ImgNamer
+#The python script that searches the web to name your images
+#Author: Dorian Daudier <daudierd@users.noreply.github.com>
+#Version 1.0
+#License: GNU GPL v3 <www.gnu.org/licenses/gpl.html>
+
+"""
+ImgNamer:
+Python script that searches the web to name your images.
+
+Functions:
+- img_rename: renames an image at the specified path
+- img_batch_rename: renames all images from a folder at the specified path
+"""
+
 import os
 import logging
 

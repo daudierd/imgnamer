@@ -27,7 +27,7 @@ def suggested_name(filepath, method='BEST_GUESS', sites=None):
     Arguments:
     - method: the method used to find an appropriate name, among the methods
     available: BEST_GUESS (default), RESULTS
-    - sites: (optional) A list of preffered sites or domains to look for first.
+    - sites: (optional) A list of preferred sites or domains to look for first.
     """
     if method == 'BEST_GUESS':
         return prettify(best_guess(filepath))
