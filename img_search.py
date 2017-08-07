@@ -1,8 +1,10 @@
 import logging
 import re
+import urllib
 
 import requests
 import bs4
+from requests_toolbelt import MultipartEncoder
 
 class SearchResult():
     """SearchResult class"""
@@ -38,7 +40,24 @@ def fetch_tineye_url(filepath):
     Returns the URL containing TinEye's search results for an image specified
     by its location.
     """
-    pass
+    try:
+        with open(filepath, 'rb') as f:
+            # We need to encode the mutlipart file, or the response will return
+            # the following message: "TinEye couldn't read that image URL"
+            multipart_data = MultipartEncoder(
+                {'image': (filepath, f)})
+            q = urllib.request.Request(tineyeSearchUrl,
+                headers={'Content-Type': multipart_data.content_type,
+                    'Content-Length': multipart_data.len,
+                    'User-Agent': user_agent,
+                    'Connection': 'keep-alive'},
+                data=multipart_data,
+                method='POST')
+            r = urllib.request.urlopen(q)
+            return r.headers['Location']
+    except Exception as e:
+        logging.error(str(e))
+        return None
 
 def fetch_results(filepath, engine='GOOGLE', **params):
     """
