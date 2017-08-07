@@ -14,7 +14,8 @@ class SearchResult():
 
 # Global variables for Google search
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0'
-searchUrl = 'https://encrypted.google.com/searchbyimage/upload'
+googleSearchUrl = 'https://encrypted.google.com/searchbyimage/upload'
+tineyeSearchUrl = 'https://tineye.com/search'
 
 def fetch_google_url(filepath):
     """
@@ -24,7 +25,7 @@ def fetch_google_url(filepath):
     try:
         with open(filepath, 'rb') as f:
             multipart = {'encoded_image': (filepath, f), 'image_content': ''}
-            response = requests.post(searchUrl,
+            response = requests.post(googleSearchUrl,
                 files=multipart,
                 allow_redirects=False)
             return response.headers['Location']
