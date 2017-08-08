@@ -73,11 +73,11 @@ def google_search(url, **params):
             headers={'User-Agent': user_agent})
         soup = bs4.BeautifulSoup(response.content, "html.parser")
         # extract results from the "Pages that include matching images" block
-        result_block = soup.find_all("div", class_="_NId")[-1]
-        results = result_block.find_all("div", class_="rc")
+        result_block = soup.select('._NId')[-1]
+        results = result_block.select(".rc")
         for res in results:
-            snippet = res.find_all("span", class_="st")[0]
-            dimensions = snippet.find_all("span", class_="f")[0].extract()
+            snippet = res.select(".st")[0]
+            dimensions = snippet.select(".f")[0].extract()
             dimensions = re.findall(r"(\d+) × (\d+)", dimensions.string)[0]
 
             out.append(SearchResult(
