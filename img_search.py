@@ -91,4 +91,29 @@ def google_search(url, **params):
         return []
 
 def tineye_search(url, num=10, **params):
-    pass
+    out=[]
+    searchUrl = url
+    for param, val in params:
+        searchUrl = searchUrl + '&' + param + '=' + val
+    try:
+        response = requests.get(searchUrl,
+            headers={'User-Agent': user_agent})
+        soup = bs4.BeautifulSoup(response.content, "html.parser")
+        # extract results in 'match-row' blocks
+        results = soup.find_all("div", class_="match-row")
+        for res in results:
+            thumbnail = res.select('.match-thumb')[0]
+            details = res.select('.match-details')[0]
+            img_link = details.select('.image-link')[0]
+            dimensions = thumbnail.p.extract()
+            dimensions = re.findall(r"(\d+)x(\d+)", dimensions.text)[0]
+
+            out.append(SearchResult(
+                dimensions,
+                img_link.a.string,
+                img_link.find_next_siblings('p')[1].a.get('href'),
+                details.select('.match')[0].text))
+        return out
+    except Exception as e:
+        logging.error(str(e))
+        return []
