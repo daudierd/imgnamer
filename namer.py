@@ -3,8 +3,8 @@ import logging
 import requests
 import bs4
 
-from img_search import fetch_results, fetch_google_url
-from img_search import SearchResult
+from .img_search import fetch_results, fetch_google_url
+from .img_search import SearchResult
 
 __all__ = ['suggested_name']
 
