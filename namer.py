@@ -3,8 +3,9 @@ import logging
 import requests
 import bs4
 
-from .img_search import fetch_results, fetch_google_url
-from .img_search import SearchResult
+from .img_search import search
+from .imgsearch import google
+from .imgsearch.result import SearchResult
 
 __all__ = ['suggested_name']
 
@@ -32,7 +33,7 @@ def suggested_name(filepath, method='BEST_GUESS', sites=None):
     if method == 'BEST_GUESS':
         return prettify(best_guess(filepath))
     elif method == 'RESULTS':
-        res = fetch_results(filepath)
+        res = search(filepath)
         return prettify(choose_best(res))
     else:
         return ''
@@ -42,7 +43,7 @@ def best_guess(filepath):
     Returns Google's best guess for an image specified by its location.
     If no suggestion can be found, an empty string is returned.
     """
-    fetchUrl = fetch_google_url(filepath)
+    fetchUrl = google.fetch_url(filepath)
 
     if (fetchUrl):
         try:
