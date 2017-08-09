@@ -6,6 +6,7 @@ import requests
 import bs4
 
 from .result import SearchResult
+from .utils import page_title
 
 # Global variables for Google search
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0'
@@ -67,11 +68,12 @@ def search(filepath, num=5, **search_params):
                 img_link = details.select('.image-link')[0]
                 dimensions = thumbnail.p.extract()
                 dimensions = re.findall(r"(\d+)x(\d+)", dimensions.text)[0]
+                location = img_link.find_next_siblings('p')[1].a.get('href')
 
                 out.append(SearchResult(
                     dimensions,
-                    img_link.a.string,
-                    img_link.find_next_siblings('p')[1].a.get('href'),
+                    page_title(location),
+                    location,
                     details.select('.match')[0].text))
                 # No need to continue if enough results have been gathered
                 if (len(out) >= num): break
