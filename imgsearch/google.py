@@ -13,8 +13,10 @@ baseUrl = 'https://encrypted.google.com/searchbyimage/upload'
 
 def fetch_url(filepath):
     """
-    Returns the URL containing Google's search results for an image specified
-    by its location.
+    Returns the URL containing Google Images' search results for an image.
+
+    Arguments:
+        - filepath: the path to the image file to search
     """
     try:
         with open(filepath, 'rb') as f:
@@ -28,6 +30,15 @@ def fetch_url(filepath):
         return None
 
 def search(filepath, num=5, **search_params):
+    """
+    Returns a list of SearchResult objects obtained with Google Images.
+
+    Arguments:
+        - filepath: the path to the image file to search
+    Optional:
+        - num: Maximum number of search results to return (default = 5)
+        - params: a dictionary of search GET parameters
+    """
     searchUrl = fetch_url(filepath)
     out=[]      # Output list of SearchResult objects
     page = 1    # Results page

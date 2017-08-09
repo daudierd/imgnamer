@@ -13,8 +13,10 @@ baseUrl = 'https://tineye.com/search'
 
 def fetch_url(filepath):
     """
-    Returns the URL containing TinEye's search results for an image specified
-    by its location.
+    Returns the URL containing TinEye's search results for an image.
+
+    Arguments:
+        - filepath: the path to the image file to search
     """
     try:
         with open(filepath, 'rb') as f:
@@ -30,6 +32,15 @@ def fetch_url(filepath):
         return None
 
 def search(filepath, num=5, **search_params):
+    """
+    Returns a list of SearchResult objects obtained with TinEye.
+
+    Arguments:
+        - filepath: the path to the image file to search
+    Optional:
+        - num: Maximum number of search results to return (default = 5)
+        - params: a dictionary of search GET parameters
+    """
     searchUrl = fetch_url(filepath)
     out=[]      # Output list of SearchResult objects
     page = 1    # Results page

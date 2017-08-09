@@ -9,12 +9,14 @@ from imgsearch import google, tineye
 
 def search(filepath, engine='GOOGLE', num=5, **params):
     """
-    Returns a list of SearchResult objects for an image search.
+    Performs a reverse image search and returns a list of SearchResult objects.
 
     Arguments:
-    - engine (GOOGLE | TINEYE): The search engine used for reverse image search
-    - pages: Maximum number of search results to return (default = 5)
-    - params: a dictionary of search parameters
+        - filepath: the path to the image file to search
+    Optional:
+        - engine (GOOGLE | TINEYE): The search engine used (default = 'GOOGLE')
+        - num: Maximum number of search results to return (default = 5)
+        - params: a dictionary of search GET parameters
     """
     if (engine == 'GOOGLE'):
         return google.search(filepath, num=num, **params)
