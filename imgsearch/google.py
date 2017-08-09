@@ -27,29 +27,41 @@ def fetch_url(filepath):
         logging.error(str(e))
         return None
 
-def search(filepath, num=5, **params):
-    out=[]
+def search(filepath, num=5, **search_params):
     searchUrl = fetch_url(filepath)
-    for param, val in params:
-        searchUrl = searchUrl + '&' + param + '=' + val
-    try:
-        response = requests.get(searchUrl,
-            headers={'User-Agent': user_agent})
+    out=[]      # Output list of SearchResult objects
+    page = 1    # Results page
+    params = '' # String containing specific search GET parameters
+    for p, val in search_params:
+        params = params + '&' + p + '=' + val
+
+    while(len(out) < num):
+        # Get results page
+        try:
+            response = requests.get(
+                searchUrl + '&start=' + str(page*10) + params,
+                headers={'User-Agent': user_agent})
+        except Exception as e:
+            logging.error(str(e))
+            return out
+
         soup = bs4.BeautifulSoup(response.content, "html.parser")
         # extract results from the "Pages that include matching images" block
-        result_block = soup.select('._NId')[-1]
-        results = result_block.select(".rc")
-        for res in results:
-            snippet = res.select(".st")[0]
-            dimensions = snippet.select(".f")[0].extract()
-            dimensions = re.findall(r"(\d+) × (\d+)", dimensions.string)[0]
+        result_block = soup.select('._NId')
+        if len(result_block) > 0:
+            results = result_block[-1].select(".rc")
+            for res in results:
+                snippet = res.select(".st")[0]
+                dimensions = snippet.select(".f")[0].extract()
+                dimensions = re.findall(r"(\d+) × (\d+)", dimensions.string)[0]
 
-            out.append(SearchResult(
-                dimensions,
-                res.find_all("h3", class_="r")[0].string,
-                res.find_all("cite", class_="_Rm")[0].string,
-                snippet.text))
-        return out
-    except Exception as e:
-        logging.error(str(e))
-        return []
+                out.append(SearchResult(
+                    dimensions,
+                    res.find_all("h3", class_="r")[0].string,
+                    res.find_all("cite", class_="_Rm")[0].string,
+                    snippet.text))
+                # No need to continue if enough results have been gathered
+                if (len(out) >= num): break
+        else:   # We may have reached the end of results
+            break
+    return out

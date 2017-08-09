@@ -29,30 +29,43 @@ def fetch_url(filepath):
         logging.error(str(e))
         return None
 
-def search(filepath, num=5, **params):
-    out=[]
+def search(filepath, num=5, **search_params):
     searchUrl = fetch_url(filepath)
-    for param, val in params:
-        searchUrl = searchUrl + '&' + param + '=' + val
-    try:
-        response = requests.get(searchUrl,
-            headers={'User-Agent': user_agent})
+    out=[]      # Output list of SearchResult objects
+    page = 1    # Results page
+    params = '' # String containing specific search GET parameters
+    for p, val in search_params:
+        params = params + '&' + p + '=' + val
+
+    while(len(out) < num):
+        # Get results page
+        try:
+            response = requests.get(searchUrl + '?page=' + str(page) + params,
+                headers={'User-Agent': user_agent})
+        except Exception as e:
+            logging.error(str(e))
+            return out
+
         soup = bs4.BeautifulSoup(response.content, "html.parser")
         # extract results in 'match-row' blocks
         results = soup.find_all("div", class_="match-row")
-        for res in results:
-            thumbnail = res.select('.match-thumb')[0]
-            details = res.select('.match-details')[0]
-            img_link = details.select('.image-link')[0]
-            dimensions = thumbnail.p.extract()
-            dimensions = re.findall(r"(\d+)x(\d+)", dimensions.text)[0]
+        if len(results) > 0:
+            for res in results:
+                thumbnail = res.select('.match-thumb')[0]
+                details = res.select('.match-details')[0]
+                img_link = details.select('.image-link')[0]
+                dimensions = thumbnail.p.extract()
+                dimensions = re.findall(r"(\d+)x(\d+)", dimensions.text)[0]
 
-            out.append(SearchResult(
-                dimensions,
-                img_link.a.string,
-                img_link.find_next_siblings('p')[1].a.get('href'),
-                details.select('.match')[0].text))
-        return out
-    except Exception as e:
-        logging.error(str(e))
-        return []
+                out.append(SearchResult(
+                    dimensions,
+                    img_link.a.string,
+                    img_link.find_next_siblings('p')[1].a.get('href'),
+                    details.select('.match')[0].text))
+                # No need to continue if enough results have been gathered
+                if (len(out) >= num): break
+
+            page = page + 1
+        else:   # We may have reached the end of results
+            break
+    return out
