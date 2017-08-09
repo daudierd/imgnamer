@@ -50,7 +50,7 @@ def search(filepath, num=5, **search_params):
         # Get results page
         try:
             response = requests.get(
-                searchUrl + '&start=' + str(page*10) + params,
+                searchUrl + '&start=' + str((page-1)*10) + params,
                 headers={'User-Agent': user_agent})
         except Exception as e:
             logging.error(str(e))
