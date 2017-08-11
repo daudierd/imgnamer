@@ -66,15 +66,3 @@ def choose_best(results):
     """
     # TO DO: for now, return the first result
     return results[0].title
-
-def dimensions_similarity(dim1, dim2):
-    """
-    Returns a value reflecting a similarity of dimensions between two images.
-    The value is 1 if dimensions are the same, and closer to 0 as it is less
-    similar.
-    """
-    def norm(x, y): return math.sqrt(x**2 + y**2)
-    
-    diff = norm(dim2[0]-dim1[0], dim2[1]-dim1[1])
-    normal_diff = diff / max(norm(dim2[0], dim2[1]), norm(dim1[0], dim1[1]))
-    return(1 - normal_diff)
