@@ -73,6 +73,7 @@ def search(filepath, num=5, **search_params):
                     snippet.text))
                 # No need to continue if enough results have been gathered
                 if (len(out) >= num): break
+            page = page + 1
         else:   # We may have reached the end of results
             break
     return out
