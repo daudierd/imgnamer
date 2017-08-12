@@ -5,6 +5,9 @@
 import re
 from urllib.parse import urlparse
 
+from .img_size import get_image_size
+from .imgsearch.result import SearchResult
+
 # The following parameters can be edited to adjust how relevance scores ar
 # calculated
 
@@ -16,13 +19,16 @@ from urllib.parse import urlparse
 # pattern is matched, by applyin the multiplication factor.
 # The placeholder is reserved to the source website name
 pattern_matches = {
-    r'(.*) by (.*) on @DeviantArt - Pinterest': 2,
+    r'profile': 0.5,
+    r'favorites': 0.5,
+    r'(.*) by (.*) on @DeviantArt - Pinterest': 2.2,
+    r'(.*) best (.*) on Pinterest': 0.9,
     r'(.*) by (.*) (on|\||\-) %s' : 2,
     r'(.*) by (.*) \| (.*) \| %s' : 2,
-    r'(.*) (on|\||\-) %s' : 1.75,
-    r'(.*) \| (.*) \| %s' : 1.75,
+    r'(.*) (on|\||\-) %s' : 1.5,
+    r'(.*) \| (.*) \| %s' : 1.5,
     r'(.*) by (.*)' : 1.5,
-    r'(.*) \| (.*) \| (.*)' : 1.5
+    r'(.*) \| (.*) \| (.*)' : 1.3
 }
 
 #######################
@@ -44,7 +50,10 @@ def pattern_score(title, location):
         if (expr.find('%s') == -1):
             pattern = expr
         else:
-            site = urlparse(location).hostname
+            if location[:4] == 'http':
+                site = urlparse(location).hostname
+            else:
+                site = urlparse('http://' + location).hostname
             site = site.split('.')
             if (site[0] == 'www'):
                 site = site[1]
@@ -54,3 +63,12 @@ def pattern_score(title, location):
 
         if re.findall(pattern, title, re.IGNORECASE):
             return val
+    # Default value on loop end if no value has been returned beforehand
+    return 1
+
+def score(result):
+    score = pattern_score(result.title, result.location)
+    #if filename:
+    #    score = score * dimensions_similarity(SearchResult.dimensions,
+    #                                          get_image_size(filename))
+    return score
