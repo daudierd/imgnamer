@@ -5,7 +5,7 @@ import re
 import requests
 import bs4
 
-from .imgsearch import google, tineye
+from .imgsearch import google, google_images, tineye
 
 def search(filepath, engine='GOOGLE', num=5, **params):
     """
@@ -14,12 +14,15 @@ def search(filepath, engine='GOOGLE', num=5, **params):
     Arguments:
         - filepath: the path to the image file to search
     Optional:
-        - engine (GOOGLE | TINEYE): The search engine used (default = 'GOOGLE')
+        - engine (GOOGLE | GOOGLE_IMAGES | TINEYE): The search engine used
+        (default = 'GOOGLE')
         - num: Maximum number of search results to return (default = 5)
         - params: a dictionary of search GET parameters
     """
     if (engine == 'GOOGLE'):
         return google.search(filepath, num=num, **params)
+    elif (engine == 'GOOGLE_IMAGES'):
+        return google_images.search(filepath, num=num, **params)
     elif (engine == 'TINEYE'):
         return tineye.search(filepath, num=num, **params)
     else:
