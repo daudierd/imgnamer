@@ -13,7 +13,7 @@ baseUrl = 'https://encrypted.google.com/searchbyimage/upload'
 
 def fetch_url(filepath):
     """
-    Returns the URL containing Google Images' search results for an image.
+    Returns the URL containing Google search results for an image.
 
     Arguments:
         - filepath: the path to the image file to search
