@@ -3,6 +3,7 @@
 # best match when naming a picture.
 
 import re
+import math
 from urllib.parse import urlparse
 
 from .img_size import get_image_size
@@ -33,19 +34,34 @@ pattern_matches = {
 
 #######################
 
+# Implementation of a 2D Vector
+class Vector():
+    """Class used to describe 2D vectors."""
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    def norm(self):
+        return math.sqrt(self.x**2 + self.y**2)
+    def __add__(self, v):
+        return(Vector(self.x + v.x, self.y + v.y))
+    def __sub__(self, v):
+        return(Vector(self.x - v.x, self.y - v.y))
+    def __mul__(self, v):
+        return ((self.x * v.x) + (self.y * v.y))
+
 def dimensions_similarity(dim1, dim2):
     """
-    Returns a value reflecting a similarity of dimensions between two images.
-    The value is 1 if dimensions are the same, and closer to 0 as it is less
-    similar.
+    Returns a value representing the similarity between two images' sizes.
+    The closer to 1, the more similar the images in terms of dimensions.
     """
-    def norm(x, y): return math.sqrt(x**2 + y**2)
+    u = Vector(int(dim1[0]), int(dim1[1]))
+    v = Vector(int(dim2[0]), int(dim2[1]))
 
-    diff = norm(dim2[0]-dim1[0], dim2[1]-dim1[1])
-    normal_diff = diff / max(norm(dim2[0], dim2[1]), norm(dim1[0], dim1[1]))
+    diff = (u-v).norm()
+    normal_diff = diff / max(u.norm(), v.norm())
     return(1 - normal_diff)
 
-def pattern_score(title, location):
+def pattern_bonus(title, location):
     for expr, val in pattern_matches.items():
         if (expr.find('%s') == -1):
             pattern = expr
@@ -66,9 +82,9 @@ def pattern_score(title, location):
     # Default value on loop end if no value has been returned beforehand
     return 1
 
-def score(result):
-    score = pattern_score(result.title, result.location)
-    #if filename:
-    #    score = score * dimensions_similarity(SearchResult.dimensions,
-    #                                          get_image_size(filename))
+def score(result, original_file=None):
+    score = pattern_bonus(result.title, result.location)
+    if original_file:
+        score = score * dimensions_similarity(result.dimensions,
+                                              get_image_size(original_file))
     return score
