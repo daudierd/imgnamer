@@ -1,12 +1,13 @@
 import logging
-import math
+import operator
 
 import requests
 import bs4
 
-from .img_search import search
-from .imgsearch import google
+from .imgsearch.google import fetch_url
 from .imgsearch.result import SearchResult
+from .img_search import search
+from .relevance import score
 
 __all__ = ['suggested_name']
 
@@ -35,7 +36,7 @@ def suggested_name(filepath, method='BEST_GUESS', sites=None):
         return prettify(best_guess(filepath))
     elif method == 'RESULTS':
         res = search(filepath)
-        return prettify(choose_best(res))
+        return prettify(choose_best(res, filepath))
     else:
         return ''
 
@@ -60,9 +61,18 @@ def best_guess(filepath):
     else:
         return ''
 
-def choose_best(results):
+def choose_best(results, original_file=None):
     """
     Determine the best name from a list of results.
     """
-    # TO DO: for now, return the first result
-    return results[0].title
+    # Rank results by score with a dictionary
+    ranked = dict()
+    for i, res in enumerate(results):
+        s = score(res, original_file=original_file) + i / 10  # add a positional bonus
+        if s not in ranked:
+            ranked[s] = []
+        ranked[s].append(res)
+    # Return the first of the best ranked results
+    ranked = sorted(ranked.items(), key=operator.itemgetter(0))
+    top_list = list(ranked)[0][1]
+    return top_list[0].title
