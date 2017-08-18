@@ -4,8 +4,8 @@ import operator
 import requests
 import bs4
 
-from .imgsearch.google import fetch_url
-from .imgsearch.result import SearchResult
+from .search import SearchResult
+from .search.google import fetch_url
 from .img_search import search
 from .relevance import score
 
@@ -45,7 +45,7 @@ def best_guess(filepath):
     Returns Google's best guess for an image specified by its location.
     If no suggestion can be found, an empty string is returned.
     """
-    fetchUrl = google.fetch_url(filepath)
+    fetchUrl = fetch_url(filepath)
 
     if (fetchUrl):
         try:

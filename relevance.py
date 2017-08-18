@@ -6,8 +6,8 @@ import re
 import math
 from urllib.parse import urlparse
 
-from .img_size import get_image_size
-from .imgsearch.result import SearchResult
+from .tools import get_image_size
+from .search import SearchResult
 
 # The following parameters can be edited to adjust how relevance scores ar
 # calculated

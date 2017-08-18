@@ -5,7 +5,7 @@ import re
 import requests
 import bs4
 
-from .imgsearch import google, google_images, tineye
+from .search import google, google_images, tineye
 
 def search(filepath, engine='GOOGLE', num=5, **params):
     """
