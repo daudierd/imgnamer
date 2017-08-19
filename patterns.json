@@ -1,15 +1,15 @@
 {
 	"specific": [
-		'(.+ by .+) on @DeviantArt - Pinterest',
-		'(.+ by .+) on DeviantArt'
+		"(.+ by .+) on @DeviantArt - Pinterest",
+		"(.+ by .+) on DeviantArt"
 	],
 	"generic": [
-		'(.+ by .+) ((on|\||\-) %s)?'
-		'(.+ by .+)'
+		"(.+ by .+) ((on|\\||\\-) %s)?",
+		"(.+ by .+)"
 	],
 	"avoid": [
-		'best .*images',
-		'profile',
-		'favorites'
+		"best .*images",
+		"profile",
+		"favorites"
 	]
 }

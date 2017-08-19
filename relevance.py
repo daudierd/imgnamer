@@ -3,36 +3,23 @@
 # best match when naming a picture.
 
 import re
+import json
 import math
 from urllib.parse import urlparse
 
 from .tools import get_image_size
 from .search import SearchResult
 
-# The following parameters can be edited to adjust how relevance scores ar
-# calculated
+# In order to improve your results, please update 'patterns.json' file
+# JSON fields:
+#   specific -> List of specific patterns, usually relevant with the source of
+#               the images. GREATLY BOOSTS RESULTS
+#   generic  -> List of generic patterns, usually applicable with different
+#               sources. BOOSTS RESULTS
+#   avoid    -> List of words that negatively impacts results
+# YOU can use '%s' in patterns to refer to a website's name
 
-#######################
-# EDITABLE PARAMETERS #
-#######################
-
-# Dictionary of (regex, score) entries that boost result relevance when regex
-# pattern is matched, by applyin the multiplication factor.
-# The placeholder is reserved to the source website name
-pattern_matches = {
-    r'profile': 0.5,
-    r'favorites': 0.5,
-    r'(.*) by (.*) on @DeviantArt - Pinterest': 2.2,
-    r'(.*) best (.*) on Pinterest': 0.9,
-    r'(.*) by (.*) (on|\||\-) %s' : 2,
-    r'(.*) by (.*) \| (.*) \| %s' : 2,
-    r'(.*) (on|\||\-) %s' : 1.5,
-    r'(.*) \| (.*) \| %s' : 1.5,
-    r'(.*) by (.*)' : 1.5,
-    r'(.*) \| (.*) \| (.*)' : 1.3
-}
-
-#######################
+patterns_file = 'patterns.json'
 
 # Implementation of a 2D Vector
 class Vector():
@@ -61,26 +48,39 @@ def dimensions_similarity(dim1, dim2):
     normal_diff = diff / max(u.norm(), v.norm())
     return(1 - normal_diff)
 
-def pattern_bonus(title, location):
-    for expr, val in pattern_matches.items():
-        if (expr.find('%s') == -1):
-            pattern = expr
+def build_pattern(expr, location):
+    if (expr.find('%s') == -1):
+        return expr
+    else:
+        if location[:4] == 'http':
+            site = urlparse(location).hostname
         else:
-            if location[:4] == 'http':
-                site = urlparse(location).hostname
-            else:
-                site = urlparse('http://' + location).hostname
-            site = site.split('.')
-            if (site[0] == 'www'):
-                site = site[1]
-            else:
-                site = site[0]
-            pattern = expr % site
+            site = urlparse('http://' + location).hostname
+        site = site.split('.')
+        if (site[0] == 'www'):
+            site = site[1]
+        else:
+            site = site[0]
+        return expr % site
 
+def apply_bonus(value, title, pattern_list):
+    for pattern in pattern_list:
         if re.findall(pattern, title, re.IGNORECASE):
-            return val
+            return value
     # Default value on loop end if no value has been returned beforehand
     return 1
+
+def pattern_bonus(title, location):
+    val = 1
+    with open(patterns_file, 'r') as f:
+        data = json.loads(f.read())
+        val = val * apply_bonus(2, title,
+            [build_pattern(e, location) for e in data['specific']])
+        val = val * apply_bonus(1.5, title,
+            [build_pattern(e, location) for e in data['generic']])
+        val = val * apply_bonus(0.5, title,
+            [build_pattern(e, location) for e in data['avoid']])
+        return val
 
 def score(result, original_file=None):
     score = pattern_bonus(result.title, result.location)
