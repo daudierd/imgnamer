@@ -97,8 +97,30 @@ def pattern_bonus(title, location):
             [build_pattern(e, location) for e in data['avoid']])
         return val
 
-def score(result, original_file=None):
+def hint_bonus(title, hint, min_size=1):
+    """
+    Returns a multiplicative bonus factor when the words in a title match those
+    of a given hint (partially or completely).
+    The optional 'min_size' allows the user to filter out words shorter than it.
+    """
+    # Convert the hint in a list of words (> min_size)
+    hint_words = hint.split(' ')
+    for word in hint_words:
+        if len(word) < min_size:
+            hint_words.remove(word)
+
+    # Count how many of the words appear in the title
+    count = 0
+    for word in hint_words:
+        # Match only words in the title
+        # (we do not use 'find' function that may match sub-words too)
+        if word.lower() in title.lower():
+             count = count + 1
+    return (1 + count/len(hint_words))
+
+def score(result, original_file=None, hint=''):
     score = pattern_bonus(result.title, result.location)
+    score = score * hint_bonus(result.title, hint, min_size=2)
     if original_file:
         score = score * dimensions_similarity(result.dimensions,
                                               get_image_size(original_file))
