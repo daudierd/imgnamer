@@ -49,6 +49,14 @@ def dimensions_similarity(dim1, dim2):
     return(1 - normal_diff)
 
 def build_pattern(expr, location):
+    """
+    Returns a pattern obtained by replacing the placeholder of an expression
+    'expr' with the host name of the website at 'location'.
+
+    Arguments:
+    - expr: a regular expression containing a placeholder
+    - location: a valid URL
+    """
     if (expr.find('%s') == -1):
         return expr
     else:
@@ -64,6 +72,9 @@ def build_pattern(expr, location):
         return expr % site
 
 def apply_bonus(value, title, pattern_list):
+    """
+    Applies a given value if 'title' matches a pattern of 'pattern_list'
+    """
     for pattern in pattern_list:
         if re.findall(pattern, title, re.IGNORECASE):
             return value
@@ -71,6 +82,10 @@ def apply_bonus(value, title, pattern_list):
     return 1
 
 def pattern_bonus(title, location):
+    """
+    Returns a multiplicative bonus factor when a result's 'title' matches one
+    of the patterns contained in 'patterns_file' file.
+    """
     val = 1
     with open(patterns_file, 'r') as f:
         data = json.loads(f.read())
