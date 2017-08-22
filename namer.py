@@ -23,20 +23,20 @@ def prettify(name):
     new_name = new_name.title()  # titlecase name
     return new_name
 
-def suggested_name(filepath, method='BEST_GUESS', sites=None):
+def suggested_name(filepath, method='BEST_GUESS', hint=''):
     """
     Returns a suggested name for a file specified by its location.
 
     Arguments:
     - method: the method used to find an appropriate name, among the methods
     available: BEST_GUESS (default), RESULTS
-    - sites: (optional) A list of preferred sites or domains to look for first.
+    - hint: (optional) A hint for naming the picture.
     """
     if method == 'BEST_GUESS':
         return prettify(best_guess(filepath))
     elif method == 'RESULTS':
         res = search(filepath)
-        return prettify(choose_best(res, filepath))
+        return prettify(choose_best(res, filepath, hint=hint))
     else:
         return ''
 
@@ -61,18 +61,19 @@ def best_guess(filepath):
     else:
         return ''
 
-def choose_best(results, original_file=None):
+def choose_best(results, original_file=None, hint=''):
     """
     Determine the best name from a list of results.
     """
     # Rank results by score with a dictionary
     ranked = dict()
     for i, res in enumerate(results):
-        s = score(res, original_file=original_file) + i / 10  # add a positional bonus
+        s = score(res, original_file=original_file, hint=hint)
+        s = s - i / 10  # include a positional malus
         if s not in ranked:
             ranked[s] = []
         ranked[s].append(res)
     # Return the first of the best ranked results
     ranked = sorted(ranked.items(), key=operator.itemgetter(0))
-    top_list = list(ranked)[0][1]
+    top_list = list(ranked)[-1][1]
     return top_list[0].title
