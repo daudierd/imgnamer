@@ -9,13 +9,13 @@ from .search.google import fetch_url
 from .img_search import search
 from .relevance import score
 
-__all__ = ['suggested_name']
+__all__ = ['suggested_name', 'best_guess']
 
 # Compatible User Agent for Google search
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0'
 
 def prettify(name):
-    new_name = new_name.title()  # titlecase name
+    new_name = name.title()  # titlecase name
     return new_name
 
 def suggested_name(results, filepath, hint=''):

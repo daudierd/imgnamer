@@ -43,16 +43,17 @@ def img_rename(filepath, method='BEST_GUESS', engines=None):
         raise UnknownImageFormat("The image extension is not supported.")
 
     # In all cases, BEST_GUESS is used at least as a hint.
-    hint = namer.suggested_name(filepath, method='BEST_GUESS')
+    hint = namer.best_guess(filepath)
     if (method == 'BEST_GUESS'):
         new_name = hint
     elif (method == 'RESULTS'):
         # aggregate resuls from the various engines
-        res = []
+        results = []
         for engine in engines:
-            res.append(search(filepath))
+            for res in search(filepath, engine=engine):
+                results.append(res)
         # use 'suggested_name' function to get an appropriate new name
-        new_name = namer.suggested_name(filepath, results, hint=hint)
+        new_name = namer.suggested_name(results, filepath, hint=hint)
 
     if new_name:
         rename(filepath, new_name)
