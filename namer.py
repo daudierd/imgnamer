@@ -11,34 +11,24 @@ from .relevance import score
 
 __all__ = ['suggested_name']
 
-# Prepare a table of forbidden filename characters to remove from filenames
-forbidden_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
-forbidden_chars = str.maketrans({key: None for key in forbidden_chars})
-
 # Compatible User Agent for Google search
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0'
 
 def prettify(name):
-    new_name = name.translate(forbidden_chars)  # Strip forbidden characters
     new_name = new_name.title()  # titlecase name
     return new_name
 
-def suggested_name(filepath, method='BEST_GUESS', hint=''):
+def suggested_name(results, filepath, hint=''):
     """
-    Returns a suggested name for a file specified by its location.
+    Returns a suggested name for a file from the results obtained by reverse
+    image search.
 
     Arguments:
-    - method: the method used to find an appropriate name, among the methods
-    available: BEST_GUESS (default), RESULTS
+    - results: list of SearchResult objects
+    - filepath: path to the original file
     - hint: (optional) A hint for naming the picture.
     """
-    if method == 'BEST_GUESS':
-        return prettify(best_guess(filepath))
-    elif method == 'RESULTS':
-        res = search(filepath)
-        return prettify(choose_best(res, filepath, hint=hint))
-    else:
-        return ''
+    return prettify(choose_best(results, filepath, hint=hint))
 
 def best_guess(filepath):
     """"
