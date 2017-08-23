@@ -14,9 +14,6 @@
 import os
 import struct
 
-class UnknownImageFormat(Exception):
-    pass
-
 def get_image_size(file_path):
     """
     Return (width, height) for a given img file content - no external
