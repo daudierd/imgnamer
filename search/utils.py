@@ -12,7 +12,10 @@ def page_title(url):
     except:
         logging.info('Couldn\'t retrieve page title at ' + url)
         return os.path.basename(url)  # Title by default if none can be found
-    
+
     chunk = chunk.__next__()
-    title = re.findall(r"<title>(.*)", chunk)[0]
-    return title.strip()
+    title = re.findall(r"<title>(.*)", chunk)
+    if title:
+        return title[0].strip()
+    else:
+        return ''
