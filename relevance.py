@@ -7,7 +7,7 @@ import json
 import math
 from urllib.parse import urlparse
 
-from .tools import get_image_size
+from .utils import get_image_size
 from .search import SearchResult
 
 # In order to improve your results, please update 'patterns.json' file
