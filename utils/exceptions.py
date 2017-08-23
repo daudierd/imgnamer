@@ -1,0 +1,2 @@
+class UnknownImageFormat(Exception):
+    pass
